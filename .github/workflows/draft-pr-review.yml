@@ -1,0 +1,11 @@
+name: Draft PR Review
+
+on:
+  pull_request:
+    types: [opened, converted_to_draft]
+
+jobs:
+  claude-review:
+    if: github.event.pull_request.draft == true
+    uses: itsumohelp/skills/.github/workflows/claude-pr-review.yml@main
+    secrets: inherit
