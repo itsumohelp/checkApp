@@ -7,7 +7,7 @@ import (
 	"checkapp/internal/presentation/api/middleware"
 )
 
-func NewRouter(postHandler *handler.PostHandler) *gin.Engine {
+func NewRouter(postHandler *handler.PostHandler, commentHandler *handler.CommentHandler) *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(middleware.Logger())
@@ -22,6 +22,10 @@ func NewRouter(postHandler *handler.PostHandler) *gin.Engine {
 		posts.DELETE("/:id", postHandler.Delete)
 		posts.PATCH("/:id/publish", postHandler.Publish)
 		posts.PATCH("/:id/unpublish", postHandler.Unpublish)
+
+		posts.POST("/:id/comments", commentHandler.Create)
+		posts.GET("/:id/comments", commentHandler.List)
+		posts.DELETE("/:id/comments/:commentId", commentHandler.Delete)
 	}
 
 	return r

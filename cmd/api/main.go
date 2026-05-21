@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	commentUC "checkapp/internal/application/usecase/comment"
 	postUC "checkapp/internal/application/usecase/post"
 	"checkapp/internal/infrastructure/database"
 	"checkapp/internal/infrastructure/persistence"
@@ -27,6 +28,7 @@ func main() {
 	}
 
 	postRepo := persistence.NewPostRepository(db)
+	commentRepo := persistence.NewCommentRepository(db)
 
 	postHandler := handler.NewPostHandler(
 		postUC.NewCreatePostUseCase(postRepo),
@@ -38,7 +40,13 @@ func main() {
 		postUC.NewUnpublishPostUseCase(postRepo),
 	)
 
-	router := api.NewRouter(postHandler)
+	commentHandler := handler.NewCommentHandler(
+		commentUC.NewCreateCommentUseCase(postRepo, commentRepo),
+		commentUC.NewListCommentsUseCase(db),
+		commentUC.NewDeleteCommentUseCase(commentRepo),
+	)
+
+	router := api.NewRouter(postHandler, commentHandler)
 
 	log.Printf("Server starting on :%s", port)
 	if err := router.Run(":" + port); err != nil {
